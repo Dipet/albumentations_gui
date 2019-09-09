@@ -33,9 +33,8 @@ class AlbumentationsGui(QMainWindow, Ui_MainWindow):
         self.transforms_tree.doubleClicked.connect(self.add_transform)
         self.list_widget_selected_transforms.doubleClicked.connect(self.remove_transform)
 
-        # self.transforms_tree.selectionChanged.connect(self.all_docs)
-        # self.list_widget_selected_transforms.selectionChanged.connect(self.added_docs)
-        # self.list_widget_selected_transforms.selectionChanged.connect(self.set_params)
+        self.transforms_tree.clicked.connect(self.tree_clicked)
+        self.list_widget_selected_transforms.clicked.connect(self.list_addeg_clicked)
 
     def open_image(self):
         path, _ = QFileDialog.getOpenFileName(parent=self,
@@ -89,14 +88,25 @@ class AlbumentationsGui(QMainWindow, Ui_MainWindow):
 
         self.update_image()
 
-    def all_docs(self, *_, **__):
-        pass
+    def tree_clicked(self, index: QModelIndex):
+        doc = self.transforms_model.get_docstring(index)
+        if doc is None:
+            return
 
-    def added_docs(self, *_, **__):
-        pass
+        self.list_widget_selected_transforms.clearSelection()
 
-    def set_params(self, *_, **__):
-        pass
+        self.text_edit_docstring.setText(doc)
+
+    def list_addeg_clicked(self, index: QModelIndex):
+        name = self.list_widget_selected_transforms.item(index.row()).text()
+
+        doc = self.transforms_model.get_docstring(name)
+        if doc is None:
+            return
+
+        self.transforms_tree.clearSelection()
+
+        self.text_edit_docstring.setText(doc)
 
     def update_image(self):
         if self.image is None:

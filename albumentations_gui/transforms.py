@@ -129,3 +129,18 @@ class TransformsModel(QAbstractItemModel):
 
     def transform_by_name(self, name):
         return self.name_to_transform[name]
+
+    def get_docstring(self, index):
+        if isinstance(index, QModelIndex):
+            name = self.transform_name_by_index(index)
+        else:
+            name = index
+
+        if not name:
+            return None
+
+        transform = self.transform_by_name(name)
+
+        signature = inspect.signature(transform.__init__)
+        doc = inspect.getdoc(transform)
+        return f'{transform.__name__}{signature}\n\n{doc})'
