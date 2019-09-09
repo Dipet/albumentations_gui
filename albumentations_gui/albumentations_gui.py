@@ -102,11 +102,11 @@ class AlbumentationsGui(QMainWindow, Ui_MainWindow):
         if self.image is None:
             return
 
-        transforms = [self.list_widget_selected_transforms.item(i) for i in range(self.list_widget_selected_transforms.count())]
-        transforms = [self.transforms_model.transform_by_name(i.text())() for i in transforms]
-        transform = albu.Compose(transforms)
-
         try:
+            transforms = [self.list_widget_selected_transforms.item(i) for i in range(self.list_widget_selected_transforms.count())]
+            transforms = [self.transforms_model.transform_by_name(i.text())() for i in transforms]
+            transform = albu.Compose(transforms)
+
             image = transform(image=self.image)['image']
             self.show_image(image)
         except Exception as err:
