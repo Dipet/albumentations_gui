@@ -1,13 +1,14 @@
+#!/usr/bin/python3
 from PyQt5.Qt import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from mainwindow_ui import Ui_MainWindow
+from .mainwindow_ui import Ui_MainWindow
 
 import cv2 as cv
 from PIL import Image, ImageQt
 
-from transforms import TransformsModel
+from .transforms import TransformsModel
 
 import albumentations
 
@@ -254,8 +255,12 @@ class AlbumentationsGui(QMainWindow, Ui_MainWindow):
         self.update_code(remove='all')
 
 
-if __name__ == '__main__':
-    app =QApplication([])
+def main():
+    app = QApplication([])
     gui = AlbumentationsGui()
     gui.show()
     app.exec_()
+
+
+if __name__ == '__main__':
+    main()
