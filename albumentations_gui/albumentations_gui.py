@@ -12,6 +12,10 @@ from transforms import TransformsModel
 import albumentations
 
 import numpy as np
+import enum
+
+import io
+import json, yaml
 
 
 IMG_EXTENSIONS = {
@@ -27,6 +31,12 @@ IMG_EXTENSIONS = {
     'OpenEXR': '*.exr',
     'HDR': '*.hdr *.pic',
 }
+
+class EnumTabs(enum.IntEnum):
+    CODE = 0
+    DOCS = 1
+    JSON = 2
+    YAML = 3
 
 
 class AlbumentationsGui(QMainWindow, Ui_MainWindow):
@@ -45,6 +55,7 @@ class AlbumentationsGui(QMainWindow, Ui_MainWindow):
         self.connect()
 
         self.update_code()
+        self.update_tab()
 
     def connect(self):
         self.button_open_image.clicked.connect(self.open_image)
@@ -56,6 +67,41 @@ class AlbumentationsGui(QMainWindow, Ui_MainWindow):
 
         self.transforms_tree.clicked.connect(self.tree_clicked)
         self.list_widget_selected_transforms.clicked.connect(self.list_added_clicked)
+
+        self.tabWidget.currentChanged.connect(self.update_tab)
+
+    def update_tab(self, index=None):
+        if index is None:
+            index = self.tabWidget.currentIndex()
+
+        if index == EnumTabs.JSON:
+            self.gen_json()
+        elif index == EnumTabs.YAML:
+            self.gen_yaml()
+
+    def gen_json(self):
+        transform = self._get_transform_from_code()
+        if transform is None:
+            self.textBrowser_json.setText('')
+
+        data = albumentations.to_dict(transform, on_not_implemented_error='warn')
+        data = json.dumps(data, indent=' ' * 4)
+
+        self.textBrowser_json.setText(data)
+
+    def gen_yaml(self):
+        transform = self._get_transform_from_code()
+        if transform is None:
+            self.textBrowser_json.setText('')
+
+        data = albumentations.to_dict(transform, on_not_implemented_error='warn')
+        with io.StringIO() as stream:
+            yaml.safe_dump(data, stream)
+
+            stream.seek(0)
+            data = stream.read()
+
+        self.textBrowser_yaml.setText(data)
 
     def open_image(self):
         all_extension = ' '.join([item for key, item in IMG_EXTENSIONS.items()])
@@ -95,17 +141,25 @@ class AlbumentationsGui(QMainWindow, Ui_MainWindow):
 
         self.update_code(add=transform)
 
-    def _get_transforms_from_code(self):
+    def _get_transform_from_code(self) -> albumentations.Compose:
         code = self.text_edit_code.toPlainText()
 
         try:
-            transform: albumentations.Compose = eval(code)
-            return transform.transforms.transforms
+            return eval(code)
         except Exception:
+            return None
+
+    def _get_transforms_list_from_code(self):
+        transform = self._get_transform_from_code()
+        if transform is None:
             return []
 
-    def _get_transform_str(self,
-                           code_transform: albumentations.BasicTransform):
+        return transform.transforms.transforms
+
+    def _get_transform_str(self, code_transform: albumentations.BasicTransform):
+        if isinstance(code_transform, str):
+            return ' ' * 4 + f'albumentations.{code_transform}(),\n'
+
         transform = code_transform.__class__()
 
         params1 = {
@@ -136,7 +190,7 @@ class AlbumentationsGui(QMainWindow, Ui_MainWindow):
         self.list_widget_selected_transforms.insertItems(0, transforms)
 
     def update_code(self, add='', remove=None):
-        transforms = self._get_transforms_from_code()
+        transforms = self._get_transforms_list_from_code()
 
         if remove is not None:
             if remove == 'all':
@@ -145,7 +199,10 @@ class AlbumentationsGui(QMainWindow, Ui_MainWindow):
                 transforms = transforms[:remove] + transforms[remove + 1:]
 
         if add:
-            transforms.append(self.transforms_model.transform_by_name(add)())
+            try:
+                transforms.append(self.transforms_model.transform_by_name(add)())
+            except TypeError as err:
+                pass
 
         code = ''.join([self._get_transform_str(i) for i in transforms])
 
@@ -155,6 +212,7 @@ class AlbumentationsGui(QMainWindow, Ui_MainWindow):
 
         self.update_image()
         self.update_list(transforms)
+        self.update_tab()
 
     def remove_transform(self, index: QModelIndex):
         self.list_widget_selected_transforms.takeItem(index.row())

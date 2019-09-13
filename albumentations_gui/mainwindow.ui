@@ -60,7 +60,11 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QTextEdit" name="text_edit_code"/>
+             <widget class="QTextEdit" name="text_edit_code">
+              <property name="lineWrapMode">
+               <enum>QTextEdit::NoWrap</enum>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -91,6 +95,58 @@
               </property>
               <property name="readOnly">
                <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab">
+           <attribute name="title">
+            <string>JSON</string>
+           </attribute>
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QTextBrowser" name="textBrowser_json">
+              <property name="lineWrapMode">
+               <enum>QTextEdit::NoWrap</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_2">
+           <attribute name="title">
+            <string>YAML</string>
+           </attribute>
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QTextBrowser" name="textBrowser_yaml">
+              <property name="lineWrapMode">
+               <enum>QTextEdit::NoWrap</enum>
               </property>
              </widget>
             </item>
