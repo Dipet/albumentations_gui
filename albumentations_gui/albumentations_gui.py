@@ -11,6 +11,20 @@ from transforms import TransformsModel
 
 import albumentations as albu
 
+IMG_EXTENSIONS = {
+    'BMP': '*.bmp *.dib',
+    'JPEG': '*.jpeg *.jpg *.jpe',
+    'JPEG 2000': '*.jp2',
+    'PNG': '*.png',
+    'WEBP': '*.webp',
+    'Portable': '*.pbm *.pgm *.ppm *.pxm *.pnm',
+    'PFM': '*.pfm',
+    'Sun': '*.sr *.ras',
+    'TIFF': '*.tiff *.tif',
+    'OpenEXR': '*.exr',
+    'HDR': '*.hdr *.pic',
+}
+
 
 class AlbumentationsGui(QMainWindow, Ui_MainWindow):
     def __init__(self, *args, **kwargs):
@@ -37,19 +51,14 @@ class AlbumentationsGui(QMainWindow, Ui_MainWindow):
         self.list_widget_selected_transforms.clicked.connect(self.list_addeg_clicked)
 
     def open_image(self):
+        all_extension = ' '.join([item for key, item in IMG_EXTENSIONS.items()])
+        filter = f'All ({all_extension});;'
+        for key, item in IMG_EXTENSIONS.items():
+            filter += f'{key} ({item});;'
+
         path, _ = QFileDialog.getOpenFileName(parent=self,
                                               caption='Open Image',
-                                              filter='BMP (*.bmp *.dib);;'
-                                                     'JPEG (*.jpeg *.jpg *.jpe);;'
-                                                     'JPEG 2000 (*.jp2);;'
-                                                     'PNG (*.png);;'
-                                                     'WEBP (*.webp);;'
-                                                     'Portable (*.pbm *.pgm *.ppm *.pxm *.pnm);;'
-                                                     'PFM (*.pfm);;'
-                                                     'Sun (*.sr *.ras);;'
-                                                     'TIFF (*.tiff *.tif);;'
-                                                     'OpenEXR (*.exr);;'
-                                                     'HDR (*.hdr *.pic)')
+                                              filter=filter)
         if not path:
             return
 
